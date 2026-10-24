@@ -1,0 +1,13 @@
+node_modules/
+.vitest/
+coverage/
+dist/
+data/*
+!data/.gitkeep
+# Written by bun run dev and bun run build: the stylesheet main.tsx imports
+src/web/styles/generated.css
+*.log
+
+.env
+.env.*
+!.env.example

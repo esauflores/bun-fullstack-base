@@ -1,0 +1,23 @@
+{
+  // The settings for everything that runs on Bun: the server, the API, the scripts and the benchmarks. The web app
+  // has its own (src/web/tsconfig.json), which extends this one with DOM and JSX in place of Bun's types.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "Preserve",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "types": ["bun"],
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
+  },
+  "include": ["src", "scripts", "vite.config.ts"],
+  "exclude": ["src/web"]
+}
