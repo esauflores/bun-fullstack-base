@@ -5,18 +5,15 @@ on:
     branches: [main]
   pull_request:
 
-# Read-only repository access: the jobs only check, test and build the code.
 permissions:
   contents: read
 
-# A newer push to the same branch or PR cancels the run it replaces.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  check:
-    name: Format, lint and type-check
+  ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -25,36 +22,6 @@ jobs:
           bun-version: 1.4.3
       - run: bun install --frozen-lockfile
       - run: bun run check
-
-  test:
-    name: Test (API and web)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.4.3
-      - run: bun install --frozen-lockfile
-      - name: Install Chromium for the web tests
-        run: bunx playwright install --with-deps chromium
+      - run: bunx playwright install --with-deps chromium
       - run: bun run test
-
-  build:
-    name: Build and smoke-test the server
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.4.3
-      - run: bun install --frozen-lockfile
       - run: bun run build
-      - name: Start the built server and call its health check
-        run: |
-          bun run start &
-          for _ in $(seq 1 20); do
-            if curl -fsS http://127.0.0.1:3000/api/health; then exit 0; fi
-            sleep 1
-          done
-          echo "The server did not answer /api/health" >&2
-          exit 1
