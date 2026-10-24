@@ -76,8 +76,11 @@ Drizzle 1.0 is still a release candidate: read the changelog before updating it.
 ## Rate limits
 
 Each client gets `RATE_LIMIT` requests a minute (300 by default, `0` for none), then `429 { error }` with
-`Retry-After`. The counts live in memory, per process; with several instances, give `rateLimit` a shared `store`
-([hono-rate-limiter](https://github.com/rhinobase/hono-rate-limiter)'s `RedisStore`).
+`Retry-After`.
+
+The counts are kept in memory, per process. This is by design: the app runs as a single instance, so one process counts
+every request. With several instances or replicas, each one counts on its own, and a client can make up to N ×
+`RATE_LIMIT` requests a minute. Run one instance, or add a shared store before scaling out.
 
 The client is the connection's IP, or behind a reverse proxy, with `TRUST_PROXY=true`, the one the proxy adds to
 `X-Forwarded-For`. Never set it without a proxy: clients can send that header. The server prints which at start.
