@@ -9,6 +9,7 @@
     "start": "bun --bun dist/server.js",
     "db:generate": "bun --bun drizzle-kit generate --config=src/api/drizzle.config.ts",
     "bench": "bun --bun run build && bun --bun scripts/bench.ts",
+    "backup": "bun --bun scripts/backup.ts",
     "check": "bun --bun vp check",
     "check:fix": "bun --bun vp check --fix",
     "test": "bun --bun vp test",

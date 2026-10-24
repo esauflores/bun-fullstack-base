@@ -11,3 +11,4 @@ src/web/styles/generated.css
 .env
 .env.*
 !.env.example
+backups/
