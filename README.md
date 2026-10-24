@@ -14,13 +14,28 @@ with Zod, documents itself from the same schemas, and types the web app's client
 
 ## Getting started
 
-Needs Bun 1.4 or later ([installation](https://bun.com/docs/installation)).
+Needs **Bun 1.4.3** exactly ([installation](https://bun.com/docs/installation)): CI, the Dockerfile and `packageManager`
+in `package.json` all pin that version, so a different one can build differently from CI.
 
 ```sh
-bun install
-bunx playwright install chromium   # once, for the web tests
-bun run dev                        # http://localhost:3000, API docs at /api/docs
+bun install --frozen-lockfile
+bunx playwright install --with-deps chromium   # once, for the web tests (--with-deps adds the Linux libraries it needs)
+bun run dev                                     # http://localhost:3000, API docs at /api/docs
 ```
+
+### Continuous integration
+
+`.github/workflows/ci.yml` runs on every push to `main` and on every pull request, in one job on `ubuntu-latest`:
+
+1. Installs Bun 1.4.3 (`oven-sh/setup-bun`) and the dependencies from the lockfile (`bun install --frozen-lockfile`, which
+   fails if `bun.lock` is out of date).
+2. `bun run check`: format, lint and type-check.
+3. `bunx playwright install --with-deps chromium`: the browser for the web tests, with its Linux system libraries.
+4. `bun run test`: the API and web tests.
+5. `bun run build`: the production build.
+
+To pass CI locally, use the same Bun version and run the same steps in order. The Docker image is built separately and
+CI does not build it.
 
 | Script                | What it does                                                                        |
 | --------------------- | ----------------------------------------------------------------------------------- |
