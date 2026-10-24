@@ -11,4 +11,5 @@ src/web/styles/generated.css
 .env
 .env.*
 !.env.example
-backups/
+backups/*
+!backups/.gitkeep
