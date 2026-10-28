@@ -67,11 +67,11 @@ The rules are in `src/api/README.md`; `src/api/notes/` and `routes/api/notes/` a
    export const GET = defineHandler.withValidator({ params: BookIdSchema })((_c, { params }) => findBook(params.id));
    ```
 
-5. **Tests**, next to the code: `books.service.test.ts` calls the service directly; `books.test.ts` calls the routes
-   through Void's app (`import app from "virtual:void-routes"`, then `app.request("/api/books/1")`): the success, each
-   error, and a 400. Each test file has a fresh in-memory database, so create the rows a test reads.
+5. **Tests**, next to the code: `books.test.ts` calls the routes through Void's app (`import app from
+   "virtual:void-routes"`, then `app.request("/api/books/1")`): the success, each error, and a 400. Each test file has a
+   fresh in-memory database, so create the rows a test reads.
 
-6. **Mock** its routes, once a page calls them, for the web tests in `src/web/mocks/worker.ts`. The web app calls
+6. **Mock** its routes, once a page calls them, for the web tests in `src/web/mocks/test.ts`. The web app calls
    them with `api("/api/books/:id", { params: { id } })`, typed from the routes (`web-api-call` skill).
 
 ## Verify

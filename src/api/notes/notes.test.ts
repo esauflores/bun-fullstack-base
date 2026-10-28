@@ -12,14 +12,21 @@ const post = (body: unknown) =>
   });
 
 describe("GET /api/notes", () => {
-  it("answers a page and the cursor for the next", async () => {
-    for (let i = 0; i < 3; i++) addNote(`Note ${i}`);
-    const response = await app.request("/api/notes?limit=2");
-    const page = (await response.json()) as { notes: { id: number }[]; next: number | null };
+  it("pages through every note once, newest first, and ends with no next", async () => {
+    const added: number[] = [];
+    for (let i = 0; i < 5; i++) added.push(addNote(`Note ${i}`).id);
+    const seen: number[] = [];
+    let next: number | null = null;
+    do {
+      const response = await app.request(`/api/notes?limit=2${next === null ? "" : `&before=${next}`}`);
+      expect(response.status).toBe(200);
+      const page = (await response.json()) as { notes: { id: number }[]; next: number | null };
+      seen.push(...page.notes.map((n) => n.id));
+      next = page.next;
+    } while (next !== null);
 
-    expect(response.status).toBe(200);
-    expect(page.notes).toHaveLength(2);
-    expect(page.next).toBe(page.notes[1]!.id);
+    expect(seen.filter((id) => added.includes(id))).toEqual([...added].reverse());
+    expect(new Set(seen).size).toBe(seen.length);
   });
 
   it("rejects a limit over 100 with a 400", async () => {

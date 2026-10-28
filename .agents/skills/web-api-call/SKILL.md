@@ -59,7 +59,7 @@ Next to the code they test: `pages/books.tsx` is tested in `pages/_books.test.ts
 as a page), a component in `src/web/components/` next to it.
 
 The web tests run in headless Chromium with the API mocked in the browser by [MSW](https://mswjs.io):
-`src/web/mocks/worker.ts` has one handler per endpoint the pages call, and tests take `it` from `src/web/mocks/test.ts`,
+`src/web/mocks/test.ts` has one handler per endpoint the pages call, and tests take `it` from it,
 which starts MSW's worker and resets the handlers after each test. A test that needs another answer takes the `worker`
 fixture and overrides a route with `worker.use(…)`: no server, database or port. The default handlers hold no state, so
 a test that writes and reads it back overrides both routes over a list of its own, answering in the shape the routes do.
@@ -99,7 +99,7 @@ it("adds a book", async ({ worker }) => {
 });
 ```
 
-Add the route's handler to `mocks/worker.ts` (that's what a new endpoint costs), and cover the error path with an
+Add the route's handler to `mocks/test.ts` (that's what a new endpoint costs), and cover the error path with an
 override: a handler answering `HttpResponse.json({ error: "…" }, { status: 400 })` puts that message on the screen.
 Anything with no handler at all answers `500 { error: "No handler for …" }`, so a forgotten mock shows up instead of
 passing.

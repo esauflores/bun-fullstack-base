@@ -18,9 +18,8 @@ pages/                 Void's pages, one per path (files starting with _ aren't 
 ├── index.tsx          `/`
 └── _index.test.tsx
 src/web/
-├── assets/            images and fonts the components import: built under a hashed name, kept by browsers (files
-│                      linked by a fixed URL, like favicon.svg, go in the root's public/ instead)
-├── env.d.ts           Vite's client types: import.meta.env, and imports of CSS and assets
+├── assets/            (create it when needed) images the components import: built under a hashed name, kept by
+│                      browsers (files linked by a fixed URL, like favicon.svg, go in the root's public/ instead)
 ├── components.json    shadcn's settings: where its components go, the stylesheet, the aliases
 ├── components/        the app's own components (ApiStatus, ThemeToggle)
 │   └── ui/            shadcn components, once added with bunx shadcn add (yours to edit)
@@ -28,8 +27,8 @@ src/web/
 │   ├── api.ts         api(): Void's typed fetch, one attempt (TanStack Query retries)
 │   └── utils.ts       cn(): merges Tailwind classes, used by the components
 ├── mocks/             the API, mocked for the tests (see Tests)
-│   ├── worker.ts      MSW's handlers, one per endpoint, and MSW's worker
-│   └── test.ts        `it` for the web tests: starts MSW's worker once per file, resets its handlers after each test
+│   └── test.ts        MSW's handlers, one per endpoint the pages call, and `it` for the web tests: starts MSW's
+│                      worker once per file, resets its handlers after each test
 ├── styles/
 │   ├── fonts.css      Geist and Geist Mono, Latin only (bundled by Vite with the CSS)
 │   └── global.css     Tailwind, shadcn's additions, and the theme (colors, fonts, radius) as CSS variables, light
@@ -66,8 +65,8 @@ it and saves the choice.
 ## Tests
 
 They run in headless Chromium (`bunx playwright install --with-deps chromium` once), with the API mocked in the browser
-by [MSW](https://mswjs.io): `mocks/worker.ts` has one handler per endpoint the pages call, and a test takes `it` from
-`mocks/test.ts`, which starts MSW's worker (its service worker is served by MSW's Vite plugin) and hands each test the
+by [MSW](https://mswjs.io): `mocks/test.ts` has one handler per endpoint the pages call, and a test takes `it` from it,
+which starts MSW's worker (its service worker is served by MSW's Vite plugin) and hands each test the
 `worker` to override a route for its own case:
 
 ```tsx

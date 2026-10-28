@@ -42,8 +42,8 @@ For a new module, use the `api-module` skill instead; the rules are in `src/api/
    );
    ```
 
-4. **Tests**: the service function in `<module>.service.test.ts`; the route in `<module>.test.ts`, through Void's
-   app: the success, each error, and a 400.
+4. **Tests**: the route in `<module>.test.ts`, through Void's app: the success, each error, and a 400. A
+   `<module>.service.test.ts` only for logic the route can't reach.
 
    ```ts
    import app from "virtual:void-routes";
@@ -56,7 +56,7 @@ For a new module, use the `api-module` skill instead; the rules are in `src/api/
    expect(response.status).toBe(201);
    ```
 
-5. **Mock** it, once a page calls it, for the web tests in `src/web/mocks/worker.ts`, answering as the route does.
+5. **Mock** it, once a page calls it, for the web tests in `src/web/mocks/test.ts`, answering as the route does.
 
 ## Verify
 

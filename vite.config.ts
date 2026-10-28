@@ -92,8 +92,6 @@ export default defineConfig({
     },
   },
   lint: {
-    /** .railway/ has its own package (railway/iac), installed only where `railway config` runs, not in CI. */
-    ignorePatterns: [".railway/**"],
     categories: { correctness: "error" },
     options: { typeAware: true, typeCheck: true },
     overrides: [

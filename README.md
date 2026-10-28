@@ -51,7 +51,7 @@ public/             files served at fixed URLs (favicon.svg, robots.txt, llms.tx
 .scripts/           the backup and benchmark scripts
 .agents/skills/     the steps for adding API modules, endpoints and API calls
 .railway/           the Railway service, as code
-void.config.ts      Void's settings: target bun, the page's <head>
+void.config.ts      Void's settings: target bun, the pages prerendered (output: static), the page's <head>
 vite.config.ts      Vite+: plugins, aliases (@/ for src/, @db/ for db/), format, lint, test projects
 ```
 

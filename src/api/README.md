@@ -20,7 +20,7 @@ routes/api/notes/[id].ts     PATCH, DELETE /api/notes/{id}
 src/api/notes/
 ├── notes.schemas.ts         the Zod schemas of its input
 ├── notes.service.ts         the logic: plain functions, no HTTP (its table is db/schema/notes.ts)
-└── *.test.ts                the service, and the routes through Void's app
+└── *.test.ts                the routes, through Void's app (the service directly, for what they don't reach)
 src/api/virtual.d.ts         the type of Void's app (virtual:void-routes): app.request("/api/…") in the tests
 ```
 
