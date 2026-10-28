@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { api, call } from "@/web/lib/api.ts";
+import { api } from "@/web/lib/api.ts";
 import { cn } from "@/web/lib/utils.ts";
 
 /** Whether the API answers its health check, and how fast; checked again every 15 seconds. */
@@ -9,7 +9,7 @@ export function ApiStatus() {
     queryKey: ["health"],
     queryFn: async () => {
       const started = performance.now();
-      await call(api.health.$get());
+      await api("/api/health");
       return { ms: Math.round(performance.now() - started) };
     },
     refetchInterval: 15_000,

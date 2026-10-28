@@ -1,6 +1,6 @@
 /*
- * Geist and Geist Mono (from @fontsource-variable), Latin only: the subsets the page needs. Bun inlines the two
- * files when it bundles the compiled stylesheet; text in other scripts uses the system font.
+ * Geist and Geist Mono (from @fontsource-variable), Latin only: the subsets the page needs. Vite bundles the two
+ * files with the stylesheet; text in other scripts uses the system font.
  */
 @font-face {
   font-family: "Geist Variable";

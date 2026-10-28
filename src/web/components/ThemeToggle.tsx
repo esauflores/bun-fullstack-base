@@ -1,11 +1,30 @@
 import { Moon, Sun } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { preferredTheme, saveTheme } from "@/web/lib/theme.ts";
+/** Light or dark: the theme's colors follow the `.dark` class on <html> (global.css). */
+type Theme = "light" | "dark";
 
-/** Switches between light and dark, and remembers the choice. */
+/**
+ * The theme on screen: void.config.ts's head script set it from the saved choice, or the system's, before the first
+ * paint.
+ */
+const currentTheme = (): Theme => (document.documentElement.classList.contains("dark") ? "dark" : "light");
+
+/** Shows a theme and saves it under "theme", the key the head script reads, for the next visit. */
+export function saveTheme(theme: Theme) {
+  document.documentElement.classList.toggle("dark", theme === "dark");
+  try {
+    localStorage.setItem("theme", theme);
+  } catch {}
+}
+
+/**
+ * Switches between light and dark, and remembers the choice. The server renders it light, as it can't know the theme;
+ * once in the browser it reads the one on screen.
+ */
 export function ThemeToggle() {
-  const [theme, setTheme] = useState(preferredTheme);
+  const [theme, setTheme] = useState<Theme>("light");
+  useEffect(() => setTheme(currentTheme()), []);
   const next = theme === "dark" ? "light" : "dark";
 
   const toggle = () => {

@@ -1,12 +1,14 @@
 {
-  // The settings for everything that runs on Bun: the server, the API, the scripts and the benchmarks. The web app
-  // has its own (src/web/tsconfig.json), which extends this one with DOM and JSX in place of Bun's types.
+  // The settings for everything that runs on Bun: the routes, the middleware, the API's code, the scripts and the
+  // benchmarks. The web app has its own, src/web/tsconfig.json (which pages/tsconfig.json extends): this one, with DOM
+  // and JSX in place of Bun's types. .void/ holds Void's generated types: the routes' types, for its typed fetch.
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2022"],
     "module": "Preserve",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@db/*": ["./db/*"]
     },
     "types": ["bun"],
     "strict": true,
@@ -18,6 +20,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "scripts", "vite.config.ts"],
+  "include": ["src", "db", "routes", "middleware", ".scripts/*.ts", "*.ts", ".void/routes.d.ts"],
   "exclude": ["src/web"]
 }

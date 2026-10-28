@@ -1,9 +1,8 @@
 import { desc, eq, lt, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
-import { db } from "@/api/core/db.ts";
-
-import { notes } from "./notes.tables.ts";
+import { db } from "@db/client.ts";
+import { notes } from "@db/schema/notes.ts";
 
 /** A page's query, prepared once, with placeholders for the values. */
 const pageQuery = db
