@@ -8,7 +8,7 @@ import { it } from "@/web/mocks/test.ts";
 import Home from "./index.tsx";
 
 /**
- * The page, against the handlers of mocks/worker.ts (MSW, in the browser): the health check and the greeting answer as
+ * The page, against the handlers of mocks/test.ts (MSW, in the browser): the health check and the greeting answer as
  * the API would, and a test overrides one of them for what the real API never answers (a 502, a health check that's
  * down). Retries are off, so an error reaches the screen at once.
  */

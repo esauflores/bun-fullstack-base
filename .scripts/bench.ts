@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 /**
  * The HTTP benchmark behind the README's table: [oha](https://github.com/hatoo/oha) loads the built server (dist/) per
  * route, ROUNDS rounds each, on a fresh server and a copy of a database of NOTES notes. `bun run bench` builds first.
- * - The server and oha are pinned to their own CPUs (taskset, Linux), and the rate limit is off.
+ * - The rate limit is off.
  * - Run it on a quiet machine on a performance power profile: a power-saving one halves every number.
  */
 const ROUNDS = 3;
@@ -16,8 +16,6 @@ const NOTES = 1_000_000;
 const SECONDS = 5;
 const CONNECTIONS = 100;
 const PORT = 3130;
-const SERVER_CPU = "1";
-const LOAD_CPUS = "2,3,6,7";
 
 const dist = fileURLToPath(new URL("../dist", import.meta.url));
 
@@ -38,17 +36,12 @@ interface Round {
 }
 
 /**
- * Runs a command, with its CPUs pinned when taskset is there. Only oha's output is read: the server's request log is
- * dropped, as a pipe nobody reads would fill and stall it.
+ * Runs a command in dist/. Only oha's output is read: the server's request log is dropped, as a pipe nobody reads
+ * would fill and stall it.
  */
-function spawn(
-  cmd: string[],
-  cpus: string,
-  { env = {}, read = false }: { env?: Record<string, string>; read?: boolean },
-) {
-  const pinned = Bun.which("taskset") ? ["taskset", "-c", cpus, ...cmd] : cmd;
+function spawn(cmd: string[], { env = {}, read = false }: { env?: Record<string, string>; read?: boolean }) {
   const output = read ? "pipe" : "ignore";
-  return Bun.spawn(pinned, { cwd: dist, env: { ...process.env, ...env }, stdout: output, stderr: "ignore" });
+  return Bun.spawn(cmd, { cwd: dist, env: { ...process.env, ...env }, stdout: output, stderr: "ignore" });
 }
 
 /** Waits for the server to answer its health check, and answers how long that took from `since`. */
@@ -65,7 +58,7 @@ async function ready(port: number, since: number): Promise<number> {
 
 /** The database every round starts from a copy of: the server makes its tables, then NOTES notes go in directly. */
 async function seed(path: string) {
-  const server = spawn(["bun", "ssr/index.js"], SERVER_CPU, {
+  const server = spawn(["bun", "ssr/index.js"], {
     env: { NODE_ENV: "production", PORT: String(PORT), DATABASE_PATH: path },
   });
   await ready(PORT, performance.now());
@@ -85,7 +78,7 @@ async function round(target: Target): Promise<Round> {
   const data = await mkdtemp(join(tmpdir(), "bench-"));
   await copyFile(seeded, join(data, "app.db"));
   const started = performance.now();
-  const server = spawn(["bun", "ssr/index.js"], SERVER_CPU, {
+  const server = spawn(["bun", "ssr/index.js"], {
     env: { NODE_ENV: "production", PORT: String(PORT), RATE_LIMIT: "0", DATABASE_PATH: join(data, "app.db") },
   });
   try {
@@ -96,7 +89,6 @@ async function round(target: Target): Promise<Round> {
         ...body,
         `http://127.0.0.1:${PORT}${target.path}`,
       ]),
-      LOAD_CPUS,
       { read: true },
     );
     const report = JSON.parse(await new Response(load.stdout).text());
@@ -129,14 +121,6 @@ async function bundlePath() {
 }
 
 if (!Bun.which("oha")) throw new Error("oha isn't installed: see https://github.com/hatoo/oha#installation");
-
-/** The power profile, where powerprofilesctl reports one: a power-saving one can cut every number by half or more. */
-const profile = Bun.which("powerprofilesctl")
-  ? Bun.spawnSync(["powerprofilesctl", "get"]).stdout.toString().trim()
-  : "";
-if (profile && profile !== "performance") {
-  console.warn(`The power profile is "${profile}": numbers will be far lower (powerprofilesctl set performance)\n`);
-}
 
 const targets: Target[] = [
   { label: "`/` (the page)", method: "GET", path: "/" },

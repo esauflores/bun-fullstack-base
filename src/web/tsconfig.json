@@ -1,11 +1,12 @@
 {
-  // The web app runs in the browser: DOM and JSX instead of Bun's types.
+  // The web app runs in the browser: DOM and JSX instead of Bun's types, and Vite's (import.meta.env, CSS and asset
+  // imports).
   // The root's paths are restated for what resolves them from this folder: shadcn's CLI, which finds components.json
   // here and resolves `@/web/…` against the folder it runs in (the root's `@/*` replaces, rather than merges, into this).
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": [],
+    "types": ["vite/client"],
     "jsx": "react-jsx",
     "paths": {
       "@/*": ["../../src/*"]
