@@ -1,6 +1,6 @@
 # Bun fullstack base
 
-> A Void app on Bun: file routes for the API (Hono, validated by Zod) and server-rendered React pages, on one server,
+> A Void app on Bun: file routes for the API (Hono, validated by Zod) and React pages prerendered at build, on one server,
 > with SQLite through Drizzle.
 
 ## API
