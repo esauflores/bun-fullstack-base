@@ -1,8 +1,8 @@
 # Bun fullstack base
 
-A [Void](https://void.cloud) app on [Bun](https://bun.com): file routes for the API and server-rendered React pages,
-on one server and one port, typed end to end. The routes validate their input with Zod, and the web app's client takes
-its types from them, so a renamed field fails `bun run check` instead of production.
+A [Void](https://void.cloud) app on [Bun](https://bun.com): file routes for the API and React pages prerendered at
+build, on one server and one port, typed end to end. The routes validate their input with Zod, and the web app's client
+takes its types from them, so a renamed field fails `bun run check` instead of production.
 
 | Part    | What                                                                                                |
 | ------- | --------------------------------------------------------------------------------------------------- |
@@ -41,7 +41,8 @@ Every setting has a default (`src/config.ts`); to change one, copy `example.env`
 ```
 routes/api/         the API, one file per path (Void): thin handlers, validated by the module's Zod schemas
 pages/              the pages, one per path (Void): layout.tsx, index.tsx; files starting with _ aren't pages
-middleware/         every request, in order: 01.errors (JSON errors), 02.security, 03.log, 04.limits
+middleware/         every request, in order: 01.errors (JSON errors), 02.security, 03.log, 04.limits,
+                    05.pages (the prerendered HTML)
 db/                 client.ts (migrated on first use), schema/ (a file per table), migrations/, drizzle.config.ts
 src/config.ts       the settings, from the environment, checked with Zod at start
 src/api/            a folder per module: <module>.schemas.ts, <module>.service.ts, tests → src/api/README.md
@@ -76,9 +77,8 @@ on a volume at `/data` (`DATABASE_PATH=/data/app.db`), and checks `/api/health`.
 
 ## Benchmark
 
-`bun run bench` builds, then loads each route with [oha](https://github.com/hatoo/oha) (`cargo install oha`), straight
-and behind [Caddy](https://caddyserver.com) (`encode zstd gzip`), 3 rounds each on a fresh server and a copy of a
-database of a million notes, and prints a table.
+`bun run bench` builds, then loads each route of the bare server with [oha](https://github.com/hatoo/oha)
+(`cargo install oha`), 3 rounds each on a fresh server and a copy of a database of a million notes, and prints a table.
 
 ## Conventions
 

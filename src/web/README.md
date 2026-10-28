@@ -1,7 +1,7 @@
 # web
 
-The React app. Void renders it from the root's `pages/` (server-rendered, then hydrated), and it calls the API
-through Void's typed `fetch`, so the routes in `routes/` are its types. `pages/index.tsx` is the example to copy.
+The React app. Void renders it from the root's `pages/` (prerendered to HTML at build, then hydrated), and it calls the
+API through Void's typed `fetch`, so the routes in `routes/` are its types. `pages/index.tsx` is the example to copy.
 
 | Piece   | What                                                                            |
 | ------- | ------------------------------------------------------------------------------- |

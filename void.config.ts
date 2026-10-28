@@ -1,8 +1,12 @@
 import { defineConfig } from "void/config";
 
-/** Built for Bun (dist/ssr/index.js); the head every page starts from. */
+/**
+ * Built for Bun (dist/ssr/index.js); the head every page starts from. The pages are written as HTML at build time
+ * (output: "static"), as they fetch their data in the browser: the server only answers the API and serves files.
+ */
 export default defineConfig({
   target: "bun",
+  output: "static",
   head: {
     title: "Bun fullstack base",
     htmlAttrs: { lang: "en" },
