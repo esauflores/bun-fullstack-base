@@ -2,14 +2,14 @@ node_modules/
 .vitest/
 coverage/
 dist/
-data/*
-!data/.gitkeep
-# Written by bun run dev and bun run build: the stylesheet main.tsx imports
-src/web/styles/generated.css
+# The local database and its backups
+.data/
+.backups/
+# Void's generated types and dev state
+.void/
+# Written by Void's dev server, even on target bun (a Cloudflare config, empty here)
+.void-wrangler.jsonc
 *.log
 
 .env
 .env.*
-!.env.example
-backups/*
-!backups/.gitkeep

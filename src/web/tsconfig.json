@@ -11,6 +11,6 @@
       "@/*": ["../../src/*"]
     }
   },
-  "include": ["."],
+  "include": [".", "../../.void/routes.d.ts"],
   "exclude": []
 }

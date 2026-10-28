@@ -2,11 +2,11 @@ import { http, HttpResponse } from "msw";
 import { setupWorker } from "msw/browser";
 
 /**
- * The page's API, answered in the browser by MSW (never the real server): one handler per endpoint, the way the routes
- * answer it, so a test doesn't need a server, a database or a port. A test overrides one route for its case with
- * `worker.use(http.get(…))`; setup.ts resets them after each test.
+ * The page's API, answered in the browser by MSW (never the real server): one handler per endpoint the pages call,
+ * the way the routes answer it, so a test doesn't need a server, a database or a port. A test overrides one route for
+ * its case with `worker.use(http.get(…))`; test.ts resets them after each test.
  */
-export const handlers = [
+const handlers = [
   http.get("/api/health", () => HttpResponse.json({ ok: true })),
   http.get("/api/hello/:name", ({ params }) => HttpResponse.json({ message: `Hello, ${String(params.name)}!` })),
   /** Anything else answers a 500 { error }, so a missing handler shows on the screen instead of passing silently. */
@@ -16,5 +16,5 @@ export const handlers = [
   }),
 ];
 
-/** The service worker vite.config.ts serves at /mockServiceWorker.js and setup.ts starts. */
+/** MSW's worker, which test.ts starts: it runs in the service worker vite.config.ts serves at /mockServiceWorker.js. */
 export const worker = setupWorker(...handlers);
