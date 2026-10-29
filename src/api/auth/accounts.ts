@@ -5,8 +5,8 @@ import { requireAuth } from "void/auth";
 import { db, eq } from "void/db";
 import { env } from "void/env";
 
-/** Better Auth's tables, as Void generates them from auth.ts (with the role): internal to Void, so by path. */
-import { accountTable, userTable } from "../../../.void/better-auth-schema.ts";
+import { TEST_USER } from "@/shared/demo.ts";
+import { accountTable, userTable } from "@schema/auth.ts";
 
 /**
  * The accounts. The admin changes notes (the cron writes as it); its password is ADMIN_PASSWORD, or random and never
@@ -21,7 +21,7 @@ function accounts() {
       role: "admin",
       password: () => env.ADMIN_PASSWORD ?? crypto.randomUUID(),
     },
-    { email: "test@example.com", name: "Test", role: "user", password: () => "test1234" },
+    { email: TEST_USER.email, name: "Test", role: "user", password: () => TEST_USER.password },
   ];
 }
 

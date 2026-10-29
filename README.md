@@ -55,6 +55,7 @@ queues/             daily.ts: makes the day's card with Workers AI (retried if t
 db/                 schema/ (the app's tables, notes and daily; Better Auth's are Void's), migrations/ (both, from `void db generate`),
                     seed.ts (local notes)
 src/api/            a folder per module: <module>.schemas.ts, <module>.service.ts, tests; auth/ → src/api/README.md
+src/shared/         constants both sides use (a note's lifetime, the test account): no server code
 src/web/            components, lib/api.ts (the typed client), mocks (MSW), styles → src/web/README.md
 public/             files served at fixed URLs (favicon.svg, robots.txt, llms.txt)
 .agents/skills/     the steps for adding API modules, endpoints and API calls
@@ -74,7 +75,7 @@ plugins/            Vite plugins: dev-crons.ts fires crons/ on their schedules i
   for a haiku and an image of it (about 0.7% of the free plan's daily AI allowance), storing the image in R2. Workers AI
   has no local simulator: in dev it uses your Cloudflare account (`void cloudflare login`), unless `AI_FAKE=true` in
   `.env`, which `example.env` sets and the tests use.
-- **The web app imports no server code**: a lint rule allows only types from `@/api` and `@schema/` in `src/web/` and
+- **The web app imports no server code**: a lint rule allows only types from `@/api` and `@schema/` in `src/web/` (values they share live in `src/shared/`) and
   `pages/`.
 
 ## Adding a feature

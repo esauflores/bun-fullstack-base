@@ -70,7 +70,8 @@ Cloudflare D1 (SQLite), with [Drizzle](https://orm.drizzle.team) through `db` fr
 request's database. Its queries are async. A Durable Object, which has no request, uses `createDb(ctx.env.DB)`.
 
 - **Tables**: one file each in `db/schema/`, re-exported by `db/schema/index.ts`. Better Auth's are Void's, generated
-  from `auth.ts` (`.void/better-auth-schema.ts`).
+  from `auth.ts` (`.void/better-auth-schema.ts`); `db/schema/auth.ts` defines the two the app writes (`user`,
+  `account`) to match, so keep it in step with `auth.ts`.
 - **Migrations**: after changing a table or `auth.ts`, `bun run db:generate` writes the SQL into `db/migrations/`;
   commit it. Dev applies new ones at start, `bun run deploy` before it uploads. Never edit one that has run: generate
   another. The local database is in `.void/`; `void db reset` remakes it from the migrations.

@@ -3,9 +3,7 @@ import { auth } from "void/client/react";
 import { connect } from "void/ws";
 
 import type { Note } from "@/api/notes/notes.service.ts";
-
-/** How long a note lives, as the API's NOTE_TTL_MS (src/api/notes/notes.service.ts). */
-const NOTE_TTL_MS = 25 * 60_000;
+import { NOTE_TTL_MS } from "@/shared/demo.ts";
 
 /**
  * The live notes, for any signed-in user: the server sends them over a WebSocket (/api/notes/live) on every
