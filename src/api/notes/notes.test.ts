@@ -4,9 +4,10 @@ import { DatabaseSync } from "node:sqlite";
 import { describe, expect, inject, it } from "vite-plus/test";
 
 import { origin, request, runCron, signIn } from "@/api/test-client.ts";
+import { TEST_USER } from "@/shared/demo.ts";
 
 const adminCookie = await signIn("admin@example.com", "admin-test");
-const userCookie = await signIn("test@example.com", "test1234");
+const userCookie = await signIn(TEST_USER.email, TEST_USER.password);
 
 /** A JSON request as the admin, unless another cookie is given. */
 const send = (method: string, path: string, body?: unknown, cookie = adminCookie) =>
@@ -25,6 +26,13 @@ describe("permissions", () => {
     expect(signedOut.status).toBe(401);
     expect(user.status).toBe(403);
     expect(await user.json()).toEqual({ error: "Only the admin changes notes" });
+  });
+
+  it("answers 413 to a body over MAX_BODY_BYTES (1 MB), before reading it", async () => {
+    const response = await post({ text: "x".repeat(1_100_000) });
+
+    expect(response.status).toBe(413);
+    expect(await response.json()).toEqual({ error: "The request body is over 1048576 bytes" });
   });
 
   it("keeps sign-up off", async () => {

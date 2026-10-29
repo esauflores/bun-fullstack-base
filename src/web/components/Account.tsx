@@ -1,8 +1,7 @@
 import { type FormEvent, useState } from "react";
 import { auth } from "void/client/react";
 
-/** The demo's viewer account (src/api/auth/accounts.ts), filled in so signing in is one click. The admin's is secret. */
-const TEST_USER = { email: "test@example.com", password: "test1234" };
+import { TEST_USER } from "@/shared/demo.ts";
 
 /**
  * Who's signed in and their role (auth.ts's field, which Void's client doesn't type), with a sign-out button; or a

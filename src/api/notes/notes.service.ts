@@ -2,13 +2,11 @@ import { env } from "cloudflare:workers";
 import { HTTPException } from "hono/http-exception";
 import { and, db, desc, eq, gte, lt } from "void/db";
 
+import { NOTE_TTL_MS } from "@/shared/demo.ts";
 import { notes } from "@schema/notes.ts";
 
 /** A note, as the API answers it. */
 export type Note = typeof notes.$inferSelect;
-
-/** How long a note lives: listed for 25 minutes after createdAt, then deleted by the cron (crons/notes.ts). */
-export const NOTE_TTL_MS = 25 * 60_000;
 
 /** The oldest createdAt still alive: createdAt is an ISO string, so the strings compare in time order. */
 const cutoff = () => new Date(Date.now() - NOTE_TTL_MS).toISOString();
