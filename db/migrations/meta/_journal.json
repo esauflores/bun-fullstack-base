@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1793171944299,
+      "tag": "20261028071904_init",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1793177515453,
+      "tag": "20261028085155_daily",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1793254784167,
+      "tag": "20261029061944_rate_limit",
+      "breakpoints": true
+    }
+  ]
+}

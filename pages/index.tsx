@@ -3,21 +3,29 @@ import { ArrowRight, ArrowUpRight, Zap } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { FetchError } from "void/client";
 
+import { Account } from "@/web/components/Account.tsx";
 import { ApiStatus } from "@/web/components/ApiStatus.tsx";
+import { DailyCard } from "@/web/components/DailyCard.tsx";
+import { Notes } from "@/web/components/Notes.tsx";
 import { ThemeToggle } from "@/web/components/ThemeToggle.tsx";
 import { api } from "@/web/lib/api.ts";
 import { cn } from "@/web/lib/utils.ts";
 
 /** What the template is made of, for "What's inside"; each links to its main tool's site. */
 const STACK = [
-  { tag: "runtime", name: "Bun", href: "https://bun.com", role: "Runs the server and its SQLite database." },
+  {
+    tag: "runtime",
+    name: "Cloudflare Workers + D1",
+    href: "https://workers.cloudflare.com",
+    role: "Runs the API, its SQLite database, the crons, the queue, the WebSocket room and the daily AI card.",
+  },
   {
     tag: "framework",
     name: "Void + Hono + Zod",
     href: "https://void.cloud",
     role: "File routes for /api, validated by Zod, on Hono.",
   },
-  { tag: "ui", name: "React 19", href: "https://react.dev", role: "The pages, rendered on the server, then live." },
+  { tag: "ui", name: "React 19", href: "https://react.dev", role: "The pages, rendered at the edge, then live." },
   { tag: "data", name: "TanStack Query", href: "https://tanstack.com/query", role: "API data, cached and refetched." },
   {
     tag: "style",
@@ -34,13 +42,26 @@ const ENDPOINTS = [
   {
     path: "/api/notes",
     href: "/api/notes",
-    description: "Notes from the database, a page at a time. POST adds one, PATCH changes one, DELETE removes one.",
+    description:
+      "Notes from the database, each for 25 minutes, a page at a time, signed in. POST, PATCH and DELETE are the admin's only.",
+  },
+  {
+    path: "/api/notes/live",
+    href: "#account",
+    description: "A WebSocket: the live notes on every change. Signed in only.",
+  },
+  {
+    path: "/api/daily",
+    href: "/api/daily",
+    description: "Today's haiku by Workers AI, made by a daily cron through a queue; its image from R2.",
   },
   { path: "/api/health", href: "/api/health", description: "Liveness check used by the status pill." },
 ];
 
 const NAV = [
   { href: "#try", label: "Try it" },
+  { href: "#account", label: "Notes" },
+  { href: "#daily", label: "Daily" },
   { href: "#stack", label: "Stack" },
   { href: "#api", label: "API" },
 ];
@@ -55,7 +76,7 @@ export default function Home() {
             <span className="grid size-7 place-items-center rounded-[7px] bg-brand text-brand-foreground">
               <Zap className="size-4" strokeWidth={2.4} />
             </span>
-            Bun fullstack base
+            Fullstack base
           </a>
           <nav aria-label="Primary" className="flex flex-auto flex-wrap gap-1">
             {NAV.map(({ href, label }) => (
@@ -78,15 +99,17 @@ export default function Home() {
       <main id="top">
         <section id="try" className="mx-auto flex max-w-300 flex-wrap items-center gap-14 px-6 pt-14 pb-10">
           <div className="min-w-0 flex-[1_1_480px]">
-            <p className="mb-5 font-mono text-[13px] tracking-[0.02em] text-brand-text">bun · void · zod · react</p>
+            <p className="mb-5 font-mono text-[13px] tracking-[0.02em] text-brand-text">
+              cloudflare · void · zod · react
+            </p>
             <h1 className="text-[clamp(40px,5.2vw,64px)] leading-[1.02] font-bold tracking-[-0.035em]">
-              One process.
+              One Worker.
               <br />
               Typed end to end.
             </h1>
             <p className="mt-6 max-w-115 text-lg leading-[1.55] text-muted-foreground">
-              A Void API and a React app served by one Bun server. Each file in routes/api is an endpoint, its Zod
-              schema validates the request and types the client: change a schema and the UI fails to compile, not in
+              A Void API and a React app served by one Cloudflare Worker. Each file in routes/api is an endpoint, its
+              Zod schema validates the request and types the client: change a schema and the UI fails to compile, not in
               production.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -100,6 +123,27 @@ export default function Home() {
             </div>
           </div>
           <Console />
+        </section>
+
+        <section id="account" aria-labelledby="account-heading" className="mx-auto max-w-300 px-6 pb-14">
+          <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
+            <h2 id="account-heading" className="text-[22px] font-semibold tracking-[-0.02em]">
+              Account and notes
+            </h2>
+            <p className="text-sm text-subtle">Better Auth roles, a Cron Trigger and a WebSocket.</p>
+          </div>
+          <Account />
+          <Notes />
+        </section>
+
+        <section id="daily" aria-labelledby="daily-heading" className="mx-auto max-w-300 px-6 pb-14">
+          <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
+            <h2 id="daily-heading" className="text-[22px] font-semibold tracking-[-0.02em]">
+              Daily card
+            </h2>
+            <p className="text-sm text-subtle">A daily Cron Trigger, a Queue, Workers AI and R2.</p>
+          </div>
+          <DailyCard />
         </section>
 
         <section id="stack" aria-labelledby="stack-heading" className="border-y bg-muted">

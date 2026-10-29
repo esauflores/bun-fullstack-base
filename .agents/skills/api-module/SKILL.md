@@ -1,7 +1,7 @@
 ---
 name: api-module
 description: Add a feature module to the API (a table in db/schema/, schemas and service in src/api/<module>/, Void file routes in routes/api/, tests), validated by Zod and callable from the web app's typed client. Use when adding a new resource or feature to the API, e.g. "add a books API" or "add endpoints for invoices".
-compatibility: Bun 1.4+. Run commands from the repo root.
+compatibility: Bun 1.4+ and Node 24+. Run commands from the repo root.
 ---
 
 # Add an API module
@@ -11,12 +11,13 @@ The rules are in `src/api/README.md`; `src/api/notes/` and `routes/api/notes/` a
 
 ## Steps
 
-1. **Table**, when the module stores data, in its own file, `db/schema/books.ts`. Then `bun run db:generate` writes the
-   migration into `db/migrations/` (commit it), which the server applies when it first opens the database. Never edit a
-   migration that exists: change the table and generate another.
+1. **Table**, when the module stores data, in its own file, `db/schema/books.ts`, re-exported from
+   `db/schema/index.ts`. Then `bun run db:generate` writes the migration into `db/migrations/` (commit it), which dev
+   applies at start and `bun run deploy` before it uploads. Never edit a migration that exists: change the table and
+   generate another.
 
    ```ts
-   import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+   import { integer, sqliteTable, text } from "void/schema-d1";
 
    export const books = sqliteTable("books", {
      id: integer().primaryKey({ autoIncrement: true }),
@@ -34,20 +35,18 @@ The rules are in `src/api/README.md`; `src/api/notes/` and `routes/api/notes/` a
    ```
 
 3. **Service**, `src/api/books/books.service.ts`: plain functions with doc comments, no HTTP. Only this module's
-   service queries its table, through `db` from `@db/client.ts`, and the queries are synchronous (no `async`). A
-   domain failure throws an `HTTPException` with a 4xx status, answered as `{ error: message }`. A query that runs on
-   most requests is prepared once, as in `src/api/notes/notes.service.ts`.
+   service queries its table, through `db` from `void/db` (D1, so the queries are async). A domain failure throws an
+   `HTTPException` with a 4xx status, answered as `{ error: message }`.
 
    ```ts
-   import { eq } from "drizzle-orm";
    import { HTTPException } from "hono/http-exception";
+   import { db, eq } from "void/db";
 
-   import { db } from "@db/client.ts";
-   import { books } from "@db/schema/books.ts";
+   import { books } from "@schema/books.ts";
 
    /** A book by its id; a 404 HTTPException when there's no such book. */
-   export function findBook(id: number) {
-     const [book] = db.select().from(books).where(eq(books.id, id)).all();
+   export async function findBook(id: number) {
+     const [book] = await db.select().from(books).where(eq(books.id, id));
      if (!book) throw new HTTPException(404, { message: "No such book" });
      return book;
    }
@@ -67,9 +66,9 @@ The rules are in `src/api/README.md`; `src/api/notes/` and `routes/api/notes/` a
    export const GET = defineHandler.withValidator({ params: BookIdSchema })((_c, { params }) => findBook(params.id));
    ```
 
-5. **Tests**, next to the code: `books.test.ts` calls the routes through Void's app (`import app from
-   "virtual:void-routes"`, then `app.request("/api/books/1")`): the success, each error, and a 400. Each test file has a
-   fresh in-memory database, so create the rows a test reads.
+5. **Tests**, next to the code: `books.test.ts` calls the routes over HTTP with `request("/api/books/1")` from
+   `@/api/test-client.ts`, against the dev server `src/api/test-server.ts` starts: the success, each error, and a 400.
+   The tests share one fresh database per run, so create the rows a test reads.
 
 6. **Mock** its routes, once a page calls them, for the web tests in `src/web/mocks/test.ts`. The web app calls
    them with `api("/api/books/:id", { params: { id } })`, typed from the routes (`web-api-call` skill).

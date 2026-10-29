@@ -4,12 +4,6 @@ import { useEffect, useState } from "react";
 /** Light or dark: the theme's colors follow the `.dark` class on <html> (global.css). */
 type Theme = "light" | "dark";
 
-/**
- * The theme on screen: void.config.ts's head script set it from the saved choice, or the system's, before the first
- * paint.
- */
-const currentTheme = (): Theme => (document.documentElement.classList.contains("dark") ? "dark" : "light");
-
 /** Shows a theme and saves it under "theme", the key the head script reads, for the next visit. */
 export function saveTheme(theme: Theme) {
   document.documentElement.classList.toggle("dark", theme === "dark");
@@ -24,7 +18,8 @@ export function saveTheme(theme: Theme) {
  */
 export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>("light");
-  useEffect(() => setTheme(currentTheme()), []);
+  /** The theme on screen: void.config.ts's head script set it, from the saved choice or the system's, before paint. */
+  useEffect(() => setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light"), []);
   const next = theme === "dark" ? "light" : "dark";
 
   const toggle = () => {

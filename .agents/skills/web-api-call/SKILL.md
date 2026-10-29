@@ -1,7 +1,7 @@
 ---
 name: web-api-call
 description: Call the API from the React web app with Void's typed fetch (api in src/web/lib/api.ts) and TanStack Query, show its errors, and test it with the API mocked by MSW. Use when a page or component needs data from /api or sends data to it.
-compatibility: Bun 1.4+. Run commands from the repo root. Web tests need Chromium once (bunx playwright install --with-deps chromium).
+compatibility: Bun 1.4+ and Node 24+. Run commands from the repo root. Web tests need Chromium once (bunx playwright install --with-deps chromium).
 ---
 
 # Call the API from the web app

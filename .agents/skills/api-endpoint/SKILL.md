@@ -1,7 +1,7 @@
 ---
 name: api-endpoint
 description: Add an endpoint to an existing API module (a Void file route in routes/api/ calling src/api/<module>/), with a JSON body, query string or path params validated by Zod, and tests. Use when an existing module needs another route, e.g. "add POST /api/books" or "let /api/books filter by title".
-compatibility: Bun 1.4+. Run commands from the repo root.
+compatibility: Bun 1.4+ and Node 24+. Run commands from the repo root.
 ---
 
 # Add an endpoint to an API module
@@ -42,17 +42,14 @@ For a new module, use the `api-module` skill instead; the rules are in `src/api/
    );
    ```
 
-4. **Tests**: the route in `<module>.test.ts`, through Void's app: the success, each error, and a 400. A
-   `<module>.service.test.ts` only for logic the route can't reach.
+4. **Tests**: the route in `<module>.test.ts`, over HTTP against the tests' dev server (`src/api/test-server.ts`):
+   the success, each error, and a 400. A route that changes data needs a session: `signIn(email, password)`.
 
    ```ts
-   import app from "virtual:void-routes";
+   import { request, signIn } from "@/api/test-client.ts";
 
-   const response = await app.request("/api/books", {
-     method: "POST",
-     headers: { "Content-Type": "application/json" },
-     body: JSON.stringify({ title: "Dune" }),
-   });
+   const cookie = await signIn("admin@example.com", "admin-test");
+   const response = await request("/api/books", { method: "POST", body: { title: "Dune" }, cookie });
    expect(response.status).toBe(201);
    ```
 

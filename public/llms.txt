@@ -1,10 +1,13 @@
 # Bun fullstack base
 
-> A Void app on Bun: file routes for the API (Hono, validated by Zod) and React pages prerendered at build, on one server,
-> with SQLite through Drizzle.
+> A Void app on Cloudflare: file routes for the API (Hono, validated by Zod) and React pages rendered at the edge, in one
+> Worker, with D1 through Drizzle.
 
 ## API
 
 - [Greeting](/api/hello/world): `GET /api/hello/{name}`, a greeting for a name
-- [Notes](/api/notes): `GET /api/notes`, a page of notes, newest first (`?limit=20&before=` a page's `next`), `POST /api/notes` with `{ "text" }` to add one, `PATCH /api/notes/{id}` to change one, and `DELETE /api/notes/{id}` to delete one
+- [Notes](/api/notes): `GET /api/notes`, a page of notes, newest first (`?limit=20&before=` a page's `next`), for any signed-in user (401 otherwise); a note lives 25 minutes. `POST /api/notes` with `{ "text" }` adds one, `PATCH /api/notes/{id}` changes one, `DELETE /api/notes/{id}` deletes one: the admin only (401 signed out, 403 otherwise)
+- Live notes: `WS /api/notes/live`, a WebSocket sending `{ "type": "notes", "notes" }` on every change, for any signed-in user
+- Auth: `POST /api/auth/sign-in/email` with `{ "email": "test@example.com", "password": "test1234" }` sets the session cookie (Better Auth), a view-only user; `POST /api/auth/sign-out` clears it
+- [Daily card](/api/daily): `GET /api/daily`, `{ "card": { "date", "text" } }`, today's haiku by Workers AI (null before the first); `GET /api/daily/{date}/image`, its image (JPEG)
 - [Health](/api/health): `GET /api/health`, whether the API is up

@@ -1,14 +1,17 @@
 import { defineConfig } from "void/config";
 
 /**
- * Built for Bun (dist/ssr/index.js); the head every page starts from. The pages are written as HTML at build time
- * (output: "static"), as they fetch their data in the browser: the server only answers the API and serves files.
+ * A Worker on Cloudflare (Void's default target), named fullstack-demo, with D1 for the database. `/` is the same for
+ * every visitor (the session and the notes load in the browser), so it's rendered once per deploy into the ISR cache,
+ * which `routing.isr` lets Void create without asking; other pages render on each request. Not `output: "static"`: that
+ * prerenders in the build, where Better Auth has no secret.
  */
 export default defineConfig({
-  target: "bun",
-  output: "static",
+  worker: { compatibility_date: "2026-02-24" },
+  cloudflare: { name: "fullstack-demo" },
+  routing: { isr: true, prerender: ["/"] },
   head: {
-    title: "Bun fullstack base",
+    title: "Fullstack base",
     htmlAttrs: { lang: "en" },
     bodyAttrs: { class: "antialiased" },
     meta: [
@@ -16,7 +19,7 @@ export default defineConfig({
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       {
         name: "description",
-        content: "A Void API and a React app served by one Bun server, typed end to end with Zod.",
+        content: "A Void app on Cloudflare: an API and a React app, typed end to end with Zod, on D1.",
       },
     ],
     link: [{ rel: "icon", href: "/favicon.svg" }],
