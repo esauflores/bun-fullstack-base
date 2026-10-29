@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "source": {
+    "name": "fullstack-demo"
+  },
+  "resolved": {
+    "name": "fullstack-demo",
+    "durable_objects": {
+      "bindings": [
+        {
+          "name": "NotesLiveWs",
+          "class_name": "NotesLiveWs"
+        }
+      ]
+    },
+    "migrations": [
+      {
+        "tag": "void-ws-v1",
+        "new_sqlite_classes": ["NotesLiveWs"]
+      }
+    ],
+    "account_id": "c06915421acba8ce1895de01fda2bfaf",
+    "compatibility_date": "2026-02-24",
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "fullstack-demo-db",
+        "database_id": "2d4d757e-a02f-4181-944c-b89819ec3044",
+        "migrations_dir": "./db/migrations"
+      }
+    ],
+    "r2_buckets": [
+      {
+        "binding": "STORAGE",
+        "bucket_name": "fullstack-demo-storage"
+      }
+    ],
+    "routes": [
+      {
+        "pattern": "fullstack-demo.esauflores.com",
+        "custom_domain": true
+      }
+    ]
+  },
+  "text": "// void:published-traffic:v1:eyJ3b3JrZXJzX2RldiI6ZmFsc2UsInByZXZpZXdfdXJscyI6ZmFsc2UsInJvdXRlcyI6W3sicGF0dGVybiI6ImZ1bGxzdGFjay1kZW1vLmVzYXVmbG9yZXMuY29tIiwiY3VzdG9tX2RvbWFpbiI6dHJ1ZX1dfQ\n{\n  \"name\": \"fullstack-demo\",\n  \"durable_objects\": {\n    \"bindings\": [\n      {\n        \"name\": \"NotesLiveWs\",\n        \"class_name\": \"NotesLiveWs\"\n      }\n    ]\n  },\n  \"migrations\": [\n    {\n      \"tag\": \"void-ws-v1\",\n      \"new_sqlite_classes\": [\n        \"NotesLiveWs\"\n      ]\n    }\n  ],\n  \"account_id\": \"c06915421acba8ce1895de01fda2bfaf\",\n  \"compatibility_date\": \"2026-02-24\",\n  \"d1_databases\": [\n    {\n      \"binding\": \"DB\",\n      \"database_name\": \"fullstack-demo-db\",\n      \"database_id\": \"2d4d757e-a02f-4181-944c-b89819ec3044\",\n      \"migrations_dir\": \"./db/migrations\"\n    }\n  ],\n  \"r2_buckets\": [\n    {\n      \"binding\": \"STORAGE\",\n      \"bucket_name\": \"fullstack-demo-storage\"\n    }\n  ],\n  \"routes\": [\n    {\n      \"pattern\": \"fullstack-demo.esauflores.com\",\n      \"custom_domain\": true\n    }\n  ]\n}\n"
+}

@@ -20,6 +20,10 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.3
+      # Vite+ and Cloudflare's local runtime (Miniflare), which the API tests start, run on Node.
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
       - run: bun install --frozen-lockfile
       - run: bun run check
       - run: bunx playwright install --with-deps chromium

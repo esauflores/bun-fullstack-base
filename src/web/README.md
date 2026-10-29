@@ -1,7 +1,8 @@
 # web
 
-The React app. Void renders it from the root's `pages/` (prerendered to HTML at build, then hydrated), and it calls the
-API through Void's typed `fetch`, so the routes in `routes/` are its types. `pages/index.tsx` is the example to copy.
+The React app. Void renders it from the root's `pages/` (`/` prerendered once per deploy into Cloudflare's cache, other
+pages rendered by the Worker on each request, then hydrated), and it calls the API through Void's typed `fetch`, so the
+routes in `routes/` are its types. `pages/index.tsx` is the example to copy.
 
 | Piece   | What                                                                            |
 | ------- | ------------------------------------------------------------------------------- |
@@ -21,7 +22,7 @@ src/web/
 ├── assets/            (create it when needed) images the components import: built under a hashed name, kept by
 │                      browsers (files linked by a fixed URL, like favicon.svg, go in the root's public/ instead)
 ├── components.json    shadcn's settings: where its components go, the stylesheet, the aliases
-├── components/        the app's own components (ApiStatus, ThemeToggle)
+├── components/        the app's own components (Account, ApiStatus, DailyCard, Notes, ThemeToggle)
 │   └── ui/            shadcn components, once added with bunx shadcn add (yours to edit)
 ├── lib/
 │   ├── api.ts         api(): Void's typed fetch, one attempt (TanStack Query retries)
@@ -33,7 +34,7 @@ src/web/
 │   ├── fonts.css      Geist and Geist Mono, Latin only (bundled by Vite with the CSS)
 │   └── global.css     Tailwind, shadcn's additions, and the theme (colors, fonts, radius) as CSS variables, light
 │                      and dark
-└── tsconfig.json      DOM and JSX in place of Bun's types (pages/tsconfig.json extends it)
+└── tsconfig.json      DOM and JSX in place of the Worker's types (pages/tsconfig.json extends it)
 ```
 
 ## Calling the API

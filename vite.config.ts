@@ -1,66 +1,48 @@
 import tailwindcss from "@tailwindcss/vite";
 import { voidReact } from "@void/react/plugin";
 import { msw } from "msw/vite";
-import { cpSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import { defineConfig } from "vite-plus";
 import { playwright } from "vite-plus/test/browser-playwright";
 import { voidPlugin } from "void";
 
-/**
- * One Vite config for everything. Void serves routes/ (the API) and pages/ (the web app) on one port, in
- * dev and from the build (dist/ssr/index.js, on Bun). Vite+ checks and tests the code: `vp check` formats, lints and
- * type-checks; `vp test` runs the API tests on Bun and the web tests in headless Chromium.
- */
-const root = fileURLToPath(new URL(".", import.meta.url));
-
-/** The `@/` (src/) and `@db/` (db/) aliases, for the app and both test projects. */
-const alias = {
-  "@": fileURLToPath(new URL("./src", import.meta.url)),
-  "@db": fileURLToPath(new URL("./db", import.meta.url)),
-};
+import { devCrons } from "./plugins/dev-crons.ts";
 
 /**
- * Void's plugins: the app's, and the API tests'. Not the web tests': Void's dev server would answer Vitest's own
- * module requests in the browser.
+ * One Vite config for everything. Void serves routes/ (the API) and pages/ (the web app) from one Worker, in dev (in
+ * Miniflare) and on Cloudflare. Vite+ checks and tests the code: `vp check` formats, lints and type-checks; `vp test`
+ * runs the API tests against a dev server and the web tests in headless Chromium.
  */
-const voidPlugins = () => [voidPlugin(), voidReact()];
+
+/** The `@/` alias (src/), for the app and both test projects. `@schema/` (db/schema/) is Void's own. */
+const alias = { "@": join(import.meta.dirname, "src") };
 
 export default defineConfig({
   resolve: { alias },
-  /** `bun run dev` on PORT (3000), as the built server, which reads it itself. */
-  server: { port: Number(process.env.PORT) || 3000 },
+  /** `bun run dev` on port 3000. */
+  server: { port: 3000 },
   plugins: [
-    ...(process.env.VITEST ? [] : voidPlugins()),
+    /** Not in the tests: the web tests run without Void, and the API tests start their own server. */
+    ...(process.env.VITEST ? [] : [voidPlugin(), voidReact(), devCrons()]),
     tailwindcss(),
-    {
-      /**
-       * The server's build takes its dependencies in, so dist/ runs without node_modules; Bun's own modules stay
-       * imports. Only the build: dev and the tests load dependencies from node_modules, CommonJS ones included.
-       */
-      name: "bundle-server",
-      apply: "build",
-      config: () => ({ ssr: { noExternal: true, external: ["bun:sqlite"] } }),
-    },
-    {
-      /** The migrations, beside the server's entry, where db/client.ts reads them in the build. */
-      name: "migrations",
-      apply: "build",
-      closeBundle() {
-        if (this.environment?.name !== "ssr") return;
-        cpSync(`${root}db/migrations`, `${root}dist/ssr/migrations`, { recursive: true });
-      },
-    },
   ],
   test: {
-    env: { DATABASE_PATH: ":memory:" },
+    /**
+     * 1s, not 10s, to wait for the servers to close: Cloudflare's Vite plugin never closes the remote Workers AI proxy
+     * the API tests' server opens (cloudflare/workers-sdk#15269, unreleased), so Vitest always waits it out. Back to the
+     * default once that ships.
+     */
+    teardownTimeout: 1_000,
     projects: [
       {
-        extends: true,
-        plugins: voidPlugins(),
+        /** The API's tests, over HTTP against a Void dev server that test-server.ts starts. */
+        resolve: { alias },
         test: {
           name: "api",
           include: ["src/api/**/*.test.ts"],
+          globalSetup: ["src/api/test-server.ts"],
+          /** Vitest's 5s default is too short for a cold Worker under the parallel run (the web tests start Chromium). */
+          testTimeout: 30_000,
         },
       },
       {
@@ -87,7 +69,7 @@ export default defineConfig({
     sortImports: {
       order: "asc",
       newlinesBetween: true,
-      internalPattern: ["@/", "@db/"],
+      internalPattern: ["@/", "@schema/"],
       groups: [["builtin", "external"], "internal", ["parent", "sibling", "index"], "style", "unknown"],
     },
   },
@@ -96,13 +78,19 @@ export default defineConfig({
     options: { typeAware: true, typeCheck: true },
     overrides: [
       {
-        // The web app runs in the browser: importing the server's code would bundle it (and bun:sqlite) into the page.
+        // The web app runs in the browser: importing the server's code would bundle it into the page.
         files: ["src/web/**", "pages/**"],
         rules: {
           "no-restricted-imports": [
             "error",
             {
-              patterns: [{ group: ["@/api/**", "@db/**"], allowTypeImports: true, message: "Server code: types only" }],
+              patterns: [
+                {
+                  group: ["@/api/**", "@schema/**"],
+                  allowTypeImports: true,
+                  message: "Server code: types only",
+                },
+              ],
             },
           ],
         },

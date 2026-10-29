@@ -1,16 +1,18 @@
 {
-  // The settings for everything that runs on Bun: the routes, the middleware, the API's code, the scripts and the
-  // benchmarks. The web app has its own, src/web/tsconfig.json (which pages/tsconfig.json extends): this one, with DOM
-  // and JSX in place of Bun's types. .void/ holds Void's generated types: the routes' types, for its typed fetch.
+  // The settings for everything that runs in the Worker: the routes, the middleware, the crons, the queues, the API's code. The web
+  // app has its own, src/web/tsconfig.json (which pages/tsconfig.json extends): this one, with DOM and JSX in place of
+  // the Worker's types. .void/ holds Void's generated types: the routes' (for its typed fetch), the env's, the DB's, the
+  // queues' (mapped to void/queues below, so `queues.daily.send()` takes queues/daily.ts's message).
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2022"],
     "module": "Preserve",
     "paths": {
       "@/*": ["./src/*"],
-      "@db/*": ["./db/*"]
+      "@schema/*": ["./db/schema/*"],
+      "void/queues": ["./.void/queues.d.ts"]
     },
-    "types": ["bun"],
+    "types": ["void/env", "node"],
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
@@ -20,6 +22,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "db", "routes", "middleware", ".scripts/*.ts", "*.ts", ".void/routes.d.ts"],
+  "include": ["src", "db", "routes", "middleware", "crons", "queues", "plugins", "*.ts", ".void/*.d.ts"],
   "exclude": ["src/web"]
 }
